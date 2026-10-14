@@ -2,7 +2,6 @@ package api
 
 import (
 	"errors"
-	"io"
 	"net/http"
 	"strconv"
 	"strings"
@@ -13,19 +12,22 @@ func NextDayHandle(w http.ResponseWriter, r *http.Request) {
 	now, err := time.Parse("20060102", r.FormValue("now"))
 	if err != nil {
 		now = time.Now()
-		repeat, err := NextDay(now, r.FormValue("date"), r.FormValue("repeat"))
+		_, err := NextDay(now, r.FormValue("date"), r.FormValue("repeat"))
 		if err != nil {
-			io.WriteString(w, err.Error())
+			writeError(w, http.StatusInternalServerError, "Внутренняя ошибка")
+			return
 		}
-		io.WriteString(w, repeat)
+		writeError(w, http.StatusInternalServerError, "Внутренняя ошибка")
+		return
 	}
 
 	repeat, err := NextDay(now, r.FormValue("date"), r.FormValue("repeat"))
 	if err != nil {
-		io.WriteString(w, err.Error())
+		writeError(w, http.StatusInternalServerError, "Внутренняя ошибка")
+		return
 	}
 
-	io.WriteString(w, repeat)
+	writeJson(w, repeat)
 }
 
 func afterDate(date, now time.Time) bool {

@@ -18,7 +18,7 @@ type ErrorResp struct {
 func tasksHandle(w http.ResponseWriter, r *http.Request) {
 	tasks, err := db.Tasks(50)
 	if err != nil {
-		writeError(w, http.StatusInternalServerError, err.Error())
+		writeError(w, http.StatusInternalServerError, "Внутренняя ошибка")
 		return
 	}
 	writeJson(w, TasksResp{Tasks: tasks})
@@ -69,7 +69,7 @@ func taskDoneHandle(w http.ResponseWriter, r *http.Request) {
 
 	if task.Repeat == "" {
 		if err = db.DeleteTask(id); err != nil {
-			writeError(w, http.StatusInternalServerError, err.Error())
+			writeError(w, http.StatusInternalServerError, "Внутренняя ошибка")
 			return
 		}
 		writeJson(w, map[string]interface{}{})
@@ -78,18 +78,18 @@ func taskDoneHandle(w http.ResponseWriter, r *http.Request) {
 
 	date, err := time.Parse("20060102", task.Date)
 	if err != nil {
-		writeError(w, http.StatusInternalServerError, err.Error())
+		writeError(w, http.StatusInternalServerError, "Внутренняя ошибка")
 		return
 	}
 
 	nextDateStr, err := NextDay(date, task.Date, task.Repeat)
 	if err != nil {
-		writeError(w, http.StatusInternalServerError, err.Error())
+		writeError(w, http.StatusInternalServerError, "Внутренняя ошибка")
 		return
 	}
 
 	if err = db.UpdateDate(nextDateStr, id); err != nil {
-		writeError(w, http.StatusInternalServerError, err.Error())
+		writeError(w, http.StatusInternalServerError, "Внутренняя ошибка")
 		return
 	}
 
@@ -111,7 +111,7 @@ func deleteTaskHandle(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := db.DeleteTask(id); err != nil {
-		writeError(w, http.StatusInternalServerError, err.Error())
+		writeError(w, http.StatusInternalServerError, "Внутренняя ошибка")
 		return
 	}
 

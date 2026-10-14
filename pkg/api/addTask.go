@@ -13,7 +13,7 @@ func addTaskHandle(w http.ResponseWriter, r *http.Request) {
 	var task db.Task
 
 	if err := json.NewDecoder(r.Body).Decode(&task); err != nil {
-		writeError(w, http.StatusInternalServerError, err.Error())
+		writeError(w, http.StatusBadRequest, err.Error())
 		return
 	}
 
@@ -28,13 +28,13 @@ func addTaskHandle(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := checkDate(&task); err != nil {
-		writeError(w, http.StatusInternalServerError, err.Error())
+		writeError(w, http.StatusBadRequest, err.Error())
 		return
 	}
 
 	id, err := db.AddTask(&task)
 	if err != nil {
-		writeError(w, http.StatusInternalServerError, err.Error())
+		writeError(w, http.StatusInternalServerError, "Внутренняя ошибка")
 		return
 	}
 
@@ -48,7 +48,7 @@ func putTaskHandle(w http.ResponseWriter, r *http.Request) {
 	var task db.Task
 
 	if err := json.NewDecoder(r.Body).Decode(&task); err != nil {
-		writeError(w, http.StatusInternalServerError, err.Error())
+		writeError(w, http.StatusBadRequest, err.Error())
 		return
 	}
 
@@ -63,12 +63,12 @@ func putTaskHandle(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := checkDate(&task); err != nil {
-		writeError(w, http.StatusInternalServerError, err.Error())
+		writeError(w, http.StatusBadRequest, err.Error())
 		return
 	}
 
 	if err := db.UpdateTask(&task); err != nil {
-		writeError(w, http.StatusInternalServerError, err.Error())
+		writeError(w, http.StatusInternalServerError, "Внутренняя ошибка")
 		return
 	}
 
