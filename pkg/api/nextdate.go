@@ -2,6 +2,7 @@ package api
 
 import (
 	"errors"
+	"log"
 	"net/http"
 	"strconv"
 	"strings"
@@ -14,15 +15,18 @@ func NextDayHandle(w http.ResponseWriter, r *http.Request) {
 		now = time.Now()
 		_, err := NextDay(now, r.FormValue("date"), r.FormValue("repeat"))
 		if err != nil {
+			log.Printf("Ошибка %v", err)
 			writeError(w, http.StatusInternalServerError, "Внутренняя ошибка")
 			return
 		}
+		log.Printf("Ошибка %v", err)
 		writeError(w, http.StatusInternalServerError, "Внутренняя ошибка")
 		return
 	}
 
 	repeat, err := NextDay(now, r.FormValue("date"), r.FormValue("repeat"))
 	if err != nil {
+		log.Printf("Ошибка %v", err)
 		writeError(w, http.StatusInternalServerError, "Внутренняя ошибка")
 		return
 	}

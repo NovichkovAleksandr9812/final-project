@@ -1,7 +1,10 @@
 package api
 
 import (
+	"database/sql"
+	"errors"
 	"final-project/pkg/db"
+	"log"
 	"net/http"
 	"strconv"
 	"time"
@@ -18,6 +21,7 @@ type ErrorResp struct {
 func tasksHandle(w http.ResponseWriter, r *http.Request) {
 	tasks, err := db.Tasks(50)
 	if err != nil {
+		log.Printf("Ошибка %v", err)
 		writeError(w, http.StatusInternalServerError, "Внутренняя ошибка")
 		return
 	}
@@ -35,6 +39,12 @@ func getTaskHandle(w http.ResponseWriter, r *http.Request) {
 	task, err := db.GetTask(id)
 
 	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			log.Printf("Ошибка %v", err)
+			writeError(w, http.StatusNotFound, "Задача с таким ID не найдена")
+			return
+		}
+		log.Printf("Ошибка %v", err)
 		writeError(w, http.StatusInternalServerError, "Ошибка базы данных")
 		return
 	}
@@ -58,6 +68,7 @@ func taskDoneHandle(w http.ResponseWriter, r *http.Request) {
 	task, err := db.GetTask(id)
 
 	if err != nil {
+		log.Printf("Ошибка %v", err)
 		writeError(w, http.StatusInternalServerError, "Ошибка базы данных")
 		return
 	}
@@ -69,6 +80,7 @@ func taskDoneHandle(w http.ResponseWriter, r *http.Request) {
 
 	if task.Repeat == "" {
 		if err = db.DeleteTask(id); err != nil {
+			log.Printf("Ошибка %v", err)
 			writeError(w, http.StatusInternalServerError, "Внутренняя ошибка")
 			return
 		}
@@ -78,17 +90,20 @@ func taskDoneHandle(w http.ResponseWriter, r *http.Request) {
 
 	date, err := time.Parse("20060102", task.Date)
 	if err != nil {
+		log.Printf("Ошибка %v", err)
 		writeError(w, http.StatusInternalServerError, "Внутренняя ошибка")
 		return
 	}
 
 	nextDateStr, err := NextDay(date, task.Date, task.Repeat)
 	if err != nil {
+		log.Printf("Ошибка %v", err)
 		writeError(w, http.StatusInternalServerError, "Внутренняя ошибка")
 		return
 	}
 
 	if err = db.UpdateDate(nextDateStr, id); err != nil {
+		log.Printf("Ошибка %v", err)
 		writeError(w, http.StatusInternalServerError, "Внутренняя ошибка")
 		return
 	}
@@ -106,11 +121,13 @@ func deleteTaskHandle(w http.ResponseWriter, r *http.Request) {
 
 	_, err := strconv.Atoi(id)
 	if err != nil {
+		log.Printf("Ошибка %v", err)
 		writeError(w, http.StatusBadRequest, "ID должен быть числом")
 		return
 	}
 
 	if err := db.DeleteTask(id); err != nil {
+		log.Printf("Ошибка %v", err)
 		writeError(w, http.StatusInternalServerError, "Внутренняя ошибка")
 		return
 	}

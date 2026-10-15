@@ -3,14 +3,14 @@ package main
 import (
 	"final-project/pkg/db"
 	"final-project/pkg/server"
-	"fmt"
+	"log"
 )
 
 func main() {
 
 	err := db.Init("scheduler.db")
 	if err != nil {
-		fmt.Println(err)
+		log.Printf("Ошибка %v", err)
 		return
 	}
 
@@ -18,7 +18,7 @@ func main() {
 
 	srv := server.CreateServer()
 	if err := srv.Server.ListenAndServe(); err != nil {
-		fmt.Println(err)
+		log.Printf("Ошибка %v", err)
 	}
 
 }
